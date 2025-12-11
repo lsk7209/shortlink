@@ -19,6 +19,7 @@ type SessionUser = {
 type AuthContextValue = {
   user: SessionUser | null
   loading: boolean
+  authReady: boolean
   signIn: () => Promise<void>
   signOut: () => Promise<void>
 }
@@ -30,6 +31,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    if (!supabase) {
+      // Supabase 설정이 없을 때도 앱이 동작하도록 로그인 기능만 비활성화
+      setUser(null)
+      setLoading(false)
+      return
+    }
     const init = async () => {
       const {
         data: { session },
@@ -64,6 +71,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [])
 
   const signIn = useCallback(async () => {
+    if (!supabase) {
+      throw new Error('로그인 기능이 비활성화되었습니다. 관리자에게 문의해 주세요.')
+    }
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
@@ -76,6 +86,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [])
 
   const signOut = useCallback(async () => {
+    if (!supabase) return
     const { error } = await supabase.auth.signOut()
     if (error) throw error
   }, [])
@@ -84,6 +95,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     () => ({
       user,
       loading,
+      authReady: Boolean(supabase),
       signIn,
       signOut,
     }),

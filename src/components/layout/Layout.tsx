@@ -12,10 +12,10 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
   }`
 
 const Header = () => {
-  const { user, loading, signIn, signOut } = useAuth()
+  const { user, loading, authReady, signIn, signOut } = useAuth()
 
   const handleAuthClick = async () => {
-    if (loading) return
+    if (loading || !authReady) return
     if (user) {
       await signOut()
       return
@@ -47,9 +47,10 @@ const Header = () => {
         <div className="flex items-center gap-2">
           <button
             onClick={handleAuthClick}
-            className="rounded-full border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700 hover:border-brand-200 hover:text-brand-700"
+            disabled={!authReady || loading}
+            className="rounded-full border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700 hover:border-brand-200 hover:text-brand-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {loading ? '...' : user ? '로그아웃' : '로그인'}
+            {loading ? '...' : !authReady ? '로그인 준비중' : user ? '로그아웃' : '로그인'}
           </button>
         </div>
       </div>
