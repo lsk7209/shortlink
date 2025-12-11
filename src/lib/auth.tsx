@@ -37,10 +37,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setLoading(false)
       return
     }
+    const client = supabase
     const init = async () => {
       const {
         data: { session },
-      } = await supabase.auth.getSession()
+      } = await client.auth.getSession()
       if (session?.user) {
         setUser({
           id: session.user.id,
@@ -52,7 +53,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setLoading(false)
     }
     void init()
-    const { data: subscription } = supabase.auth.onAuthStateChange((_event, currentSession) => {
+    const { data: subscription } = client.auth.onAuthStateChange((_event, currentSession) => {
       if (currentSession?.user) {
         setUser({
           id: currentSession.user.id,
@@ -71,10 +72,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [])
 
   const signIn = useCallback(async () => {
-    if (!supabase) {
+    const client = supabase
+    if (!client) {
       throw new Error('로그인 기능이 비활성화되었습니다. 관리자에게 문의해 주세요.')
     }
-    const { error } = await supabase.auth.signInWithOAuth({
+    const { error } = await client.auth.signInWithOAuth({
       provider: 'google',
       options: {
         redirectTo: `${window.location.origin}/links`,
@@ -86,8 +88,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [])
 
   const signOut = useCallback(async () => {
-    if (!supabase) return
-    const { error } = await supabase.auth.signOut()
+    const client = supabase
+    if (!client) return
+    const { error } = await client.auth.signOut()
     if (error) throw error
   }, [])
 
