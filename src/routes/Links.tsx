@@ -15,7 +15,7 @@ type LinkItem = {
 }
 
 const Links = () => {
-  const { user } = useAuth()
+  const { user, loading: authLoading, authReady, signIn } = useAuth()
   const [items, setItems] = useState<LinkItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -97,6 +97,24 @@ const Links = () => {
           새 링크 만들기
         </button>
       </div>
+      {!authReady && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          Supabase 환경 변수가 설정되지 않아 로그인 기능이 비활성화되어 있습니다. 환경 변수를 설정한 후 다시 시도해 주세요.
+        </div>
+      )}
+      {authReady && !authLoading && !user && (
+        <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+          <div>
+            로그인 후 내 링크를 확인하고 관리할 수 있습니다. 상단 로그인 버튼을 눌러 Google 계정으로 로그인하세요.
+          </div>
+          <button
+            onClick={signIn}
+            className="rounded-full border border-brand-200 px-3 py-1 text-xs font-semibold text-brand-700 hover:bg-brand-50"
+          >
+            로그인
+          </button>
+        </div>
+      )}
       <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
         <div className="mb-4 flex flex-wrap gap-3">
           <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-2 py-1">

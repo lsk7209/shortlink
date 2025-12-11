@@ -4,7 +4,7 @@ import { apiFetch } from '../lib/api'
 import { useAuth } from '../lib/auth'
 
 const Admin = () => {
-  const { user } = useAuth()
+  const { user, loading: authLoading, authReady, signIn } = useAuth()
   const [stats, setStats] = useState<{
     totalLinks: number
     activeLinks: number
@@ -93,6 +93,22 @@ const Admin = () => {
         <h1 className="text-2xl font-semibold text-slate-900">관리자 콘솔</h1>
         <p className="text-sm text-slate-600">전체 링크, 사용자별 필터, 활동 로그를 검토합니다.</p>
       </div>
+      {!authReady && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          Supabase 환경 변수가 없어 관리자 기능이 비활성화되어 있습니다. 환경 변수를 설정한 후 다시 시도해 주세요.
+        </div>
+      )}
+      {authReady && !authLoading && !user && (
+        <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+          <div>관리자 페이지는 로그인 후에만 접근할 수 있습니다. Google 계정으로 로그인해 주세요.</div>
+          <button
+            onClick={signIn}
+            className="rounded-full border border-brand-200 px-3 py-1 text-xs font-semibold text-brand-700 hover:bg-brand-50"
+          >
+            로그인
+          </button>
+        </div>
+      )}
       <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
         {error && <p className="text-sm text-rose-600">{error}</p>}
         {!error && !stats && <p className="text-sm text-slate-600">통계 불러오는 중...</p>}
